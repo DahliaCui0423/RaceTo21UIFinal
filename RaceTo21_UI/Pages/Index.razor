@@ -1,0 +1,242 @@
+﻿@page "/"
+
+@if (page == Page.Main)
+{
+    <div class="headTitle">
+        <div class="text">
+            <h1>Race to 21</h1>
+        </div>
+    </div>
+
+    <div class="row mt-2" id="userInput">
+        <div class="col-sm-6" id="message">
+            Player number: <strong>@DisplayValue</strong>
+        </div>
+        <div class="col-sm-6" id="slideinput">
+            <input type="range" min="2" max="10" @onchange="UpdateValue" />
+        </div>
+    </div>
+    @for (int i = 1; i <= playerNumber; i++)
+    {
+        <div class="row mt-2" id="players">
+            <div class="col-sm-6" id="playerMessage">
+                Player#@i Name:
+            </div>
+            <div class="col-sm-6" id="playerName">
+                <input type="text" placeholder="Enter Name" @onchange="AddPlayers" />
+            </div>
+        </div>
+    }
+    <div class="BUTTON">
+        <button class="button" type="button" @onclick="() => PageChange(Page.Game)">
+            START
+        </button>
+    </div>
+}
+else if (page == Page.Game)
+{
+    <div class="headTitle">
+        <div class="text">
+            <h1>Race To 21</h1>
+        </div>
+    </div>
+
+    <div class="pickCard">
+        <div class="yesOrNo">
+            <div class="yesOrNoMessage">
+                @PlayerShow(currentPlayerIndex), do you want card(s)?
+            </div>
+            <div class="yesOrNoButtons">
+                <button class="buttonYes" type="button" @onclick="() => ChoiceChange(true)">
+                    Yes
+                </button>
+                <button class="buttonNo" type="button" @onclick="() => ChoiceChange(false)">
+                    No
+                </button>
+            </div>
+        </div>
+
+        <div class="buttonChoice">
+            @if (buttonChoice)
+            {
+                <div class="pickMessage">
+                    How many cards do you want?
+                </div>
+                <div class="row mt-2">
+                    <div class="col-sm-6 btn-group" role="group">
+                        @for (int buttonNumber = 1; buttonNumber < 4; buttonNumber++)
+                        {
+                            int btnNum = buttonNumber;
+                            <button type="button" class="btn btn-secondary"
+                                    @onclick="() => ButtonClick(btnNum)">
+                                @buttonNumber
+                            </button>
+                        }
+                    </div>
+                </div>
+
+            }
+        </div>
+
+    </div>
+
+
+
+    <div class="tables">
+        <table>
+            <thead>
+                <tr>
+                    @for (int i = 0; i < playerNumber; i++)
+                    {
+                        <th>@PlayerShow(i)</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    @for (int i = 0; i < playerNumber; i++)
+                    {
+                        <td>
+                            @ShowPlayerStatus(i)
+                            @ShowPlayerScore(i)
+                            @if (PlayerCardShow(i) != null)
+                            {
+                                @foreach (var cardImg in PlayerCardShow(i))
+                                {
+                                    <li class="list-group-item">
+                                        <img src="card_assets/@cardImg" />
+                                    </li>
+                                }
+                            }
+
+                        </td>
+                    }
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+}
+
+
+
+
+
+@code
+{
+    private enum Page
+    {
+        Main,
+        Game
+    }
+
+    private Page page = Page.Main;
+
+    private string DisplayValue = "";
+    private int playerNumber = 0;
+    private int currentPlayerIndex = 0;
+    private bool buttonChoice = false;
+    private int choiceTime = 0;
+    private int cardNumber = 0;
+
+    private void UpdateValue(ChangeEventArgs e)
+    {
+        DisplayValue = e.Value.ToString();
+        playerNumber = int.Parse(DisplayValue);
+    }
+
+    private ValueTask PageChange(Page e)
+    {
+        page = e;
+        return ValueTask.CompletedTask;
+    }
+
+    static CardTable cardTable = new CardTable();
+    Game game = new Game(cardTable);
+    public void AddPlayers(ChangeEventArgs e)
+    {
+        game.AddPlayer((string)e.Value);
+        game.CheckPlayer();
+    }
+
+    private string PlayerShow(int i)
+    {
+        return game.PlayerShow(i);
+    }
+
+    private ValueTask ChoiceChange(bool b)
+    {
+        buttonChoice = b;
+        choiceTime++;
+        if(b == false)
+        {
+            PlayerStay(currentPlayerIndex);
+            NextPlayer();
+        }
+        return ValueTask.CompletedTask;
+    }
+
+    private void PlayerTurn(int playerIndex, bool buttonChoice, int cardNumber)
+    {
+        Console.WriteLine("Player turn execute");
+        game.PlayerTurn(playerIndex, buttonChoice, cardNumber);
+    }
+
+    public void ButtonClick(int cardNum)
+    {
+        cardNumber = cardNum;
+        Console.WriteLine("cards number: " + cardNumber);
+        PlayerTurn(currentPlayerIndex, buttonChoice, cardNumber);
+        NextPlayer();
+    }
+
+    private List<string> PlayerCardShow(int i)
+    {
+        List<Card> cards = game.showPlayerCard(i);
+        Console.WriteLine("Here's the cards:");
+        Console.Write(cards);
+        if (cards != null)
+        {
+            List<string> showCardInfo = new List<string>();
+            foreach (Card card in cards)
+            {
+                showCardInfo.Add(game.CardsToShow(card));
+            }
+            return showCardInfo;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    private void PlayerStay(int playerIndex)
+    {
+        game.PlayerStay(playerIndex);
+    }
+
+    private string ShowPlayerStatus(int playerIndex)
+    {
+        return game.showPlayerStatus(playerIndex);
+    }
+
+    private string ShowPlayerScore(int playerIndex)
+    {
+        return game.showPlayerScore(playerIndex);
+    }
+
+    private void NextPlayer()
+    {
+        if (currentPlayerIndex < playerNumber - 1)
+        {
+            currentPlayerIndex++;
+        }
+        else
+        {
+            currentPlayerIndex = 0;
+        }
+        cardNumber = 0;
+        choiceTime = 0;
+        buttonChoice = false;
+    }
+}

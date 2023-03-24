@@ -1,0 +1,47 @@
+﻿<Properties StartupConfiguration="{342AF124-2B9A-4940-9DE7-AA3413FC8C40}|Default">
+  <MonoDevelop.Ide.Workbench ActiveDocument="RaceTo21_UI/Pages/Index.razor">
+    <Files>
+      <File FileName="RaceTo21_UI/Pages/Index.razor" Line="207" Column="13" />
+      <File FileName="RaceTo21_UI/wwwroot/css/app.css" Line="118" Column="2" />
+      <File FileName="RaceTo21_UI/wwwroot/index.html" Line="1" Column="1" />
+      <File FileName="RaceTo21_UI/Pages/Counter.razor" />
+      <File FileName="RaceTo21_UI/_Imports.razor" />
+      <File FileName="RaceTo21_UI/Shared/MainLayout.razor" />
+      <File FileName="RaceTo21_UI/Shared/MainLayout.razor.css" />
+      <File FileName="RaceTo21_UI/Shared/NavMenu.razor" />
+      <File FileName="RaceTo21_UI/Program.cs" />
+      <File FileName="RaceTo21_UI/Shared/SurveyPrompt.razor" />
+      <File FileName="RaceTo21_UI/App.razor" />
+      <File FileName="RaceTo21_UI/Pages/Game.cs" Line="82" Column="47" />
+      <File FileName="RaceTo21_UI/Pages/Deck.cs" Line="24" Column="37" />
+      <File FileName="RaceTo21_UI/Pages/Task.cs" Line="1" Column="1" />
+      <File FileName="RaceTo21_UI/Pages/PlayerStatus.cs" />
+      <File FileName="RaceTo21_UI/Pages/Player.cs" />
+      <File FileName="RaceTo21_UI/Pages/CardTable.cs" />
+      <File FileName="RaceTo21_UI/Pages/Card.cs" Line="1" Column="1" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="RaceTo21_UI" expanded="True">
+            <Node name="RaceTo21_UI" expanded="True">
+              <Node name="Pages" expanded="True">
+                <Node name="Index.razor" selected="True" />
+              </Node>
+              <Node name="wwwroot" expanded="True">
+                <Node name="css" expanded="True" />
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.ItemProperties.RaceTo21__UI PreferredExecutionTarget="/Applications/Google Chrome.app" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+</Properties>
