@@ -40,45 +40,53 @@ else if (page == Page.Game)
             <h1>Race To 21</h1>
         </div>
     </div>
-
-    <div class="pickCard">
-        <div class="yesOrNo">
-            <div class="yesOrNoMessage">
-                @PlayerShow(currentPlayerIndex), do you want card(s)?
-            </div>
-            <div class="yesOrNoButtons">
-                <button class="buttonYes" type="button" @onclick="() => ChoiceChange(true)">
-                    Yes
-                </button>
-                <button class="buttonNo" type="button" @onclick="() => ChoiceChange(false)">
-                    No
-                </button>
-            </div>
-        </div>
-
-        <div class="buttonChoice">
-            @if (buttonChoice)
-            {
-                <div class="pickMessage">
-                    How many cards do you want?
+    @if (winner == null)
+    {
+        <div class="pickCard">
+            <div class="yesOrNo">
+                <div class="yesOrNoMessage">
+                    @PlayerShow(currentPlayerIndex), do you want card(s)?
                 </div>
-                <div class="row mt-2">
-                    <div class="col-sm-6 btn-group" role="group">
-                        @for (int buttonNumber = 1; buttonNumber < 4; buttonNumber++)
-                        {
-                            int btnNum = buttonNumber;
-                            <button type="button" class="btn btn-secondary"
-                                    @onclick="() => ButtonClick(btnNum)">
-                                @buttonNumber
-                            </button>
-                        }
+                <div class="yesOrNoButtons">
+                    <button class="buttonYes" type="button" @onclick="() => ChoiceChange(true)">
+                        Yes
+                    </button>
+                    <button class="buttonNo" type="button" @onclick="() => ChoiceChange(false)">
+                        No
+                    </button>
+                </div>
+            </div>
+
+            <div class="buttonChoice">
+                @if (buttonChoice)
+                {
+                    <div class="pickMessage">
+                        How many cards do you want?
                     </div>
-                </div>
+                    <div class="row mt-2">
+                        <div class="col-sm-6 btn-group" role="group">
+                            @for (int buttonNumber = 1; buttonNumber < 4; buttonNumber++)
+                            {
+                                int btnNum = buttonNumber;
+                                <button type="button" class="btn btn-secondary"
+                                        @onclick="() => ButtonClick(btnNum)">
+                                    @buttonNumber
+                                </button>
+                            }
+                        </div>
+                    </div>
 
-            }
+                }
+            </div>
+
         </div>
+    }
+                else
+                {
+                    <div>Winner is @winner</div>
+                    <button>Next Round</button>
+                }
 
-    </div>
 
 
 
@@ -138,6 +146,8 @@ else if (page == Page.Game)
     private bool buttonChoice = false;
     private int choiceTime = 0;
     private int cardNumber = 0;
+    private string winner = null;
+    private bool endCheck = false;
 
     private void UpdateValue(ChangeEventArgs e)
     {
@@ -168,10 +178,15 @@ else if (page == Page.Game)
     {
         buttonChoice = b;
         choiceTime++;
-        if(b == false)
+        if (b == false)
         {
             PlayerStay(currentPlayerIndex);
-            NextPlayer();
+            endCheck = CheckForEnd();
+            if (!endCheck)
+            {
+                NextPlayer();
+            }
+
         }
         return ValueTask.CompletedTask;
     }
@@ -187,7 +202,11 @@ else if (page == Page.Game)
         cardNumber = cardNum;
         Console.WriteLine("cards number: " + cardNumber);
         PlayerTurn(currentPlayerIndex, buttonChoice, cardNumber);
-        NextPlayer();
+        endCheck = CheckForEnd();
+        if (!endCheck)
+        {
+            NextPlayer();
+        }
     }
 
     private List<string> PlayerCardShow(int i)
@@ -238,5 +257,18 @@ else if (page == Page.Game)
         cardNumber = 0;
         choiceTime = 0;
         buttonChoice = false;
+    }
+
+    private bool CheckForEnd()
+    {
+        winner = game.checkForEnd(playerNumber);
+        if (winner == null)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
 }

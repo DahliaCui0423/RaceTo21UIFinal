@@ -91,7 +91,7 @@ using RaceTo21_UI.Shared;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 126 "/Users/cuiwenyue/Projects/RaceTo21_UI/RaceTo21_UI/Pages/Index.razor"
+#line 134 "/Users/cuiwenyue/Projects/RaceTo21_UI/RaceTo21_UI/Pages/Index.razor"
  
     private enum Page
     {
@@ -107,6 +107,8 @@ using RaceTo21_UI.Shared;
     private bool buttonChoice = false;
     private int choiceTime = 0;
     private int cardNumber = 0;
+    private string winner = null;
+    private bool endCheck = false;
 
     private void UpdateValue(ChangeEventArgs e)
     {
@@ -137,10 +139,15 @@ using RaceTo21_UI.Shared;
     {
         buttonChoice = b;
         choiceTime++;
-        if(b == false)
+        if (b == false)
         {
             PlayerStay(currentPlayerIndex);
-            NextPlayer();
+            endCheck = CheckForEnd();
+            if (!endCheck)
+            {
+                NextPlayer();
+            }
+
         }
         return ValueTask.CompletedTask;
     }
@@ -156,7 +163,11 @@ using RaceTo21_UI.Shared;
         cardNumber = cardNum;
         Console.WriteLine("cards number: " + cardNumber);
         PlayerTurn(currentPlayerIndex, buttonChoice, cardNumber);
-        NextPlayer();
+        endCheck = CheckForEnd();
+        if (!endCheck)
+        {
+            NextPlayer();
+        }
     }
 
     private List<string> PlayerCardShow(int i)
@@ -207,6 +218,19 @@ using RaceTo21_UI.Shared;
         cardNumber = 0;
         choiceTime = 0;
         buttonChoice = false;
+    }
+
+    private bool CheckForEnd()
+    {
+        winner = game.checkForEnd(playerNumber);
+        if (winner == null)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
 
 #line default

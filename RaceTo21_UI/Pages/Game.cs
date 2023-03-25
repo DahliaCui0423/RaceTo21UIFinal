@@ -122,6 +122,101 @@ namespace RaceTo21_UI.Pages
             }
         }
 
+        public string checkForEnd(int PlayerNumber)
+        {
+            if (!CheckActivePlayers())
+            {
+                if (CheckStayPlayers() == PlayerNumber)
+                {
+                    int notTakeCards = 0;
+                    int stayScore = 0;
+                    foreach (Player player in players)
+                    {
+                        if (player.score == 0)
+                        {
+                            notTakeCards++;
+                        }
+                        else if (player.score > stayScore)
+                        {
+                            stayScore = player.score;
+                            Roundwinner = player;
+                        }
+                    }
+                    if (notTakeCards == PlayerNumber)
+                    {
+                        foreach (Player player in players)
+                        {
+                            player.status = PlayerStatus.active;
+                            //nextTask = Task.PlayerTurn;
+                        }
+                        return null;
+                    }
+                    else
+                    {
+                        SetPlayerStatusWin(Roundwinner);
+                        return Roundwinner.name;
+                        //cardTable.AnnounceWinner(Roundwinner);
+                        //nextTask = Task.RoundEnd;
+                    }
+
+
+
+                }
+                else
+                {
+                    Player winner = DoFinalScoring();
+                    //cardTable.AnnounceWinner(winner);
+                    Roundwinner = winner;
+                    SetPlayerStatusWin(Roundwinner);
+                    return Roundwinner.name;
+                    //nextTask = Task.RoundEnd;
+                }
+            }
+            else if (CheckBustPlayers() == numberOfPlayers - 1)
+            {
+                foreach (Player player in players)
+                {
+                    if (player.status == PlayerStatus.active)
+                    {
+                        //cardTable.ShowHands(players);
+                        //cardTable.AnnounceWinner(player);
+                        Roundwinner = player;
+                        //nextTask = Task.RoundEnd;
+                        
+                    }
+                }
+                SetPlayerStatusWin(Roundwinner);
+                return Roundwinner.name;
+            }
+            else if (Roundwinner != null)
+            {
+                //nextTask = Task.RoundEnd;
+                SetPlayerStatusWin(Roundwinner);
+                return Roundwinner.name;
+            }
+            else
+            {
+                currentPlayer++;
+                if (currentPlayer > players.Count - 1)
+                {
+                    currentPlayer = 0; // back to the first player...
+                }
+                //nextTask = Task.PlayerTurn;
+                return null;
+            }
+        }
+
+        public void SetPlayerStatusWin(Player winner)
+        {
+            foreach(Player player in players)
+            {
+                if(player.name == winner.name)
+                {
+                    player.status = PlayerStatus.win;
+                }
+            }
+        }
+
         /* Figures out what task to do next in game
          * as represented by field nextTask
          * Calls methods required to complete task
