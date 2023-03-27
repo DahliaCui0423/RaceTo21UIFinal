@@ -115,7 +115,7 @@ a, .btn-link {
 .row mt-2, .col-sm-6 btn-group{
     text-align:center;  
 }
-.tables{
+.tables, .options {
     text-align: center;
 }
 
@@ -139,5 +139,17 @@ th {
 td {
     font-size: 30px;
 }
+
+.result{
+    text-align:center;
+    font-size:30px;
+    color:red;
+}
+
+.table-Contaioner{
+    display:flex;
+    justify-content:center;
+}
+
 
 

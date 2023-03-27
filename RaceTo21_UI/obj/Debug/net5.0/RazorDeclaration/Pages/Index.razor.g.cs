@@ -91,7 +91,7 @@ using RaceTo21_UI.Shared;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 163 "/Users/cuiwenyue/Projects/RaceTo21_UI/RaceTo21_UI/Pages/Index.razor"
+#line 165 "/Users/cuiwenyue/Projects/RaceTo21_UI/RaceTo21_UI/Pages/Index.razor"
  
     private enum Page
     {

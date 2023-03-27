@@ -63,18 +63,20 @@ else if (page == Page.Game)
                     <div class="pickMessage">
                         How many cards do you want?
                     </div>
-                    <div class="row mt-2">
+                    <div class="options">
                         <div class="col-sm-6 btn-group" role="group">
                             @for (int buttonNumber = 1; buttonNumber < 4; buttonNumber++)
                             {
                                 int btnNum = buttonNumber;
-                                <button type="button" class="btn btn-secondary"
+                                <button type="button" class="btn btn-secondary" color ="red"
                                         @onclick="() => ButtonClick(btnNum)">
                                     @buttonNumber
                                 </button>
                             }
                         </div>
                     </div>
+                   
+
 
                 }
             </div>
@@ -85,7 +87,7 @@ else if (page == Page.Game)
     {
         @if (!askEnd)
         {
-            <div>Winner is @winner</div>
+            <div class="result">Winner is @winner</div>
             <div class="yesOrNo">
                 @PlayerShow(currentPlayerIndex) Do you want to continue?
             </div>
@@ -109,7 +111,7 @@ else if (page == Page.Game)
 
 
 
-    <div class="tables">
+    <div class="table-Contaioner">
         <table>
             <thead>
                 <tr>
