@@ -81,11 +81,30 @@ else if (page == Page.Game)
 
         </div>
     }
-                else
-                {
-                    <div>Winner is @winner</div>
-                    <button>Next Round</button>
-                }
+    else
+    {
+        @if (!askEnd)
+        {
+            <div>Winner is @winner</div>
+            <div class="yesOrNo">
+                @PlayerShow(currentPlayerIndex) Do you want to continue?
+            </div>
+            <div class="yesOrNoButtons">
+                <button class="buttonYes" type="button" @onclick="() => CheckContinue(true)">
+                    Yes
+                </button>
+                <button class="buttonNo" type="button" @onclick="() => CheckContinue(false)">
+                    No
+                </button>
+            </div>
+
+        }
+        else
+        {
+            <div>Round End</div>
+        }
+
+    }
 
 
 
@@ -120,10 +139,20 @@ else if (page == Page.Game)
                         </td>
                     }
                 </tr>
+                <tr>
+                    @for (int i = 0; i < playerNumber; i++)
+                    {
+                        <td>Points: @PlayerPoints(i)</td>
+                    }
+                </tr>
             </tbody>
         </table>
     </div>
 
+}
+else if (page == Page.End)
+{
+    <div> Game Over! </div>
 }
 
 
@@ -135,7 +164,8 @@ else if (page == Page.Game)
     private enum Page
     {
         Main,
-        Game
+        Game,
+        End
     }
 
     private Page page = Page.Main;
@@ -148,6 +178,8 @@ else if (page == Page.Game)
     private int cardNumber = 0;
     private string winner = null;
     private bool endCheck = false;
+    private int playerToMoveNumber = 0;
+    private bool askEnd = false;
 
     private void UpdateValue(ChangeEventArgs e)
     {
@@ -200,7 +232,7 @@ else if (page == Page.Game)
     public void ButtonClick(int cardNum)
     {
         cardNumber = cardNum;
-        Console.WriteLine("cards number: " + cardNumber);
+        //Console.WriteLine("cards number: " + cardNumber);
         PlayerTurn(currentPlayerIndex, buttonChoice, cardNumber);
         endCheck = CheckForEnd();
         if (!endCheck)
@@ -268,7 +300,51 @@ else if (page == Page.Game)
         }
         else
         {
+            currentPlayerIndex = 0;
             return true;
+        }
+    }
+
+    private string PlayerPoints(int playerIndex)
+    {
+        string points = null;
+        points = game.PlayerPoints(playerIndex).ToString();
+        return points;
+    }
+
+    private ValueTask CheckContinue(bool b)
+    {
+        game.AskContinue(currentPlayerIndex, b);
+        if (!b)
+        {
+            playerToMoveNumber++;
+        }
+        currentPlayerIndex++;
+        if (currentPlayerIndex == playerNumber)
+        {
+            RoundEnd();
+        }
+        return ValueTask.CompletedTask;
+    }
+
+    private void RoundEnd()
+    {
+        string result = game.RoundEnd();
+        if (result == "Restart")
+        {
+            playerNumber -= playerToMoveNumber;
+            currentPlayerIndex = 0;
+            buttonChoice = false;
+            choiceTime = 0;
+            cardNumber = 0;
+            winner = null;
+            endCheck = false;
+            playerToMoveNumber = 0;
+            askEnd = false;
+        }
+        else
+        {
+            page = Page.End;
         }
     }
 }

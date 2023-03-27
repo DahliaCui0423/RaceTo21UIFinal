@@ -14,6 +14,9 @@ namespace RaceTo21_UI.Pages
         public Task nextTask { set; get; } // keeps track of game state
         private bool cheating { set; get; } = false; // lets you cheat for testing purposes if true
         Player Roundwinner { set; get; } = null;
+        List<int> playerToMove = new List<int>();
+        Player tempwinner = null;
+        int indextmp = -1;
 
         public Game(CardTable c)
         {
@@ -29,15 +32,16 @@ namespace RaceTo21_UI.Pages
         public void AddPlayer(string n)
         {
             players.Add(new Player(n));
+            numberOfPlayers++;
         }
 
         public void CheckPlayer()
         {
-            foreach(Player player in players)
+            foreach (Player player in players)
             {
                 Console.WriteLine(player.name);
             }
-                
+
         }
 
         public string CardsToShow(Card card) => deck.ShowCard(card.id);
@@ -172,7 +176,7 @@ namespace RaceTo21_UI.Pages
                     //nextTask = Task.RoundEnd;
                 }
             }
-            else if (CheckBustPlayers() == numberOfPlayers - 1)
+            else if (CheckBustPlayers() == PlayerNumber - 1)
             {
                 foreach (Player player in players)
                 {
@@ -182,7 +186,7 @@ namespace RaceTo21_UI.Pages
                         //cardTable.AnnounceWinner(player);
                         Roundwinner = player;
                         //nextTask = Task.RoundEnd;
-                        
+
                     }
                 }
                 SetPlayerStatusWin(Roundwinner);
@@ -208,12 +212,115 @@ namespace RaceTo21_UI.Pages
 
         public void SetPlayerStatusWin(Player winner)
         {
-            foreach(Player player in players)
+            foreach (Player player in players)
             {
-                if(player.name == winner.name)
+                if (player.name == winner.name)
                 {
                     player.status = PlayerStatus.win;
                 }
+            }
+        }
+
+        public int PlayerPoints(int playerIndex)
+        {
+            Player player = players[playerIndex];
+            if (player.status == PlayerStatus.win)
+            {
+                player.points += player.score;
+            }
+            if (player.status == PlayerStatus.bust)
+            {
+                player.points -= player.score - 21;
+            }
+
+            return player.points;
+        }
+
+        public void AskContinue(int i, bool ask)
+        {
+            if (!ask)
+            {
+                playerToMove.Add(i);
+                numberOfPlayers--;
+            }
+            else
+            {
+                players[i].status = PlayerStatus.active;
+                players[i].cards = new List<Card>();
+                players[i].score = 0;
+                if (players[i] == Roundwinner)
+                {
+                    tempwinner = Roundwinner;
+                    indextmp = i;
+                }
+            }
+        }
+
+        public string RoundEnd()
+        {
+            Roundwinner = null;
+            bool pointMax = false;
+            foreach (Player player in players)
+            {
+                if (player.points >= 100)
+                {
+                    pointMax = true;
+                }
+            }
+
+            //cardTable.ShowPoints(players);
+            if (pointMax)
+            {
+                //Console.WriteLine("Someone reaches the max point! Game End!");
+                //nextTask = Task.GameOver;
+                Console.WriteLine("GameOver1");
+                return "GameOver";
+            }
+            else
+            {
+                if (numberOfPlayers == 0)
+                {
+                    Console.WriteLine("GameOver2");
+                    return "GameOver";
+                }
+                else if (numberOfPlayers == 1)
+                {
+                    Console.WriteLine("GameOver3");
+                    return players[0].name;
+                }
+                else
+                {
+                    if (playerToMove != null)
+                    {
+                        foreach (int playerIndex in playerToMove)
+                        {
+                            players.Remove(players[playerIndex]);
+                        }
+                    }
+                    deck = new Deck();
+                    deck.Shuffle();
+                    currentPlayer = 0;
+                    //Console.WriteLine("Shuffling players...");
+                    if (tempwinner != null)
+                    {
+                        Player tmpter = players[players.Count - 1];
+                        players[players.Count - 1] = tempwinner;
+                        players[indextmp] = tmpter;
+                    }
+                    Random rng = new Random();
+                    for (int i = 0; i < players.Count - 1; i++)
+                    {
+                        Player tmp = players[i];
+                        int swapindex = rng.Next(players.Count - 1);
+                        players[i] = players[swapindex];
+                        players[swapindex] = tmp;
+                    }
+                    //Console.WriteLine("Done.");
+                    //Console.WriteLine("================================");
+                    //cardTable.ShowPlayers(players);
+                    //nextTask = Task.PlayerTurn;
+                    return "Restart";
+                } 
             }
         }
 
@@ -254,7 +361,7 @@ namespace RaceTo21_UI.Pages
                     {
                         int numberOfCards = cardTable.GetNumberOfCardstoDraw();
 
-                        for(int i=0;i<numberOfCards;i++)
+                        for (int i = 0; i < numberOfCards; i++)
                         {
                             Card card = deck.DealTopCard();
                             player.cards.Add(card);
@@ -286,16 +393,17 @@ namespace RaceTo21_UI.Pages
             {
                 if (!CheckActivePlayers())
                 {
-                    if(CheckStayPlayers() == numberOfPlayers)
+                    if (CheckStayPlayers() == numberOfPlayers)
                     {
                         int notTakeCards = 0;
                         int stayScore = 0;
-                        foreach(Player player in players)
+                        foreach (Player player in players)
                         {
                             if (player.score == 0)
                             {
                                 notTakeCards++;
-                            } else if (player.score > stayScore)
+                            }
+                            else if (player.score > stayScore)
                             {
                                 stayScore = player.score;
                                 Roundwinner = player;
@@ -304,7 +412,7 @@ namespace RaceTo21_UI.Pages
                         if (notTakeCards == numberOfPlayers)
                         {
                             cardTable.AnnounceWinner(null);
-                            foreach(Player player in players)
+                            foreach (Player player in players)
                             {
                                 player.status = PlayerStatus.active;
                                 nextTask = Task.PlayerTurn;
@@ -315,23 +423,23 @@ namespace RaceTo21_UI.Pages
                             cardTable.AnnounceWinner(Roundwinner);
                             nextTask = Task.RoundEnd;
                         }
-                        
-                        
-                        
+
+
+
                     }
                     else
                     {
                         Player winner = DoFinalScoring();
-                        cardTable.AnnounceWinner(winner);                  
+                        cardTable.AnnounceWinner(winner);
                         Roundwinner = winner;
                         nextTask = Task.RoundEnd;
                     }
                 }
                 else if (CheckBustPlayers() == numberOfPlayers - 1)
                 {
-                    foreach(Player player in players)
+                    foreach (Player player in players)
                     {
-                        if(player.status == PlayerStatus.active)
+                        if (player.status == PlayerStatus.active)
                         {
                             cardTable.ShowHands(players);
                             cardTable.AnnounceWinner(player);
@@ -360,7 +468,7 @@ namespace RaceTo21_UI.Pages
                 bool pointMax = false;
                 foreach (Player player in players)
                 {
-                    if (player== Roundwinner)
+                    if (player == Roundwinner)
                     {
                         player.points += player.score;
                     }
@@ -371,7 +479,7 @@ namespace RaceTo21_UI.Pages
                     if (player.points >= 100)
                     {
                         pointMax = true;
-                        
+
                     }
                 }
                 cardTable.ShowPoints(players);
@@ -447,8 +555,8 @@ namespace RaceTo21_UI.Pages
                         nextTask = Task.PlayerTurn;
                     }
                     Roundwinner = null;
-                }   
-               
+                }
+
             }
             else // we shouldn't get here...
             {
@@ -493,7 +601,7 @@ namespace RaceTo21_UI.Pages
                             score = score + 10;
                             break;
                         default:
-                            score = score + int.Parse(faceValue.Substring(0,1));
+                            score = score + int.Parse(faceValue.Substring(0, 1));
                             break;
                     }
                 }
@@ -524,7 +632,7 @@ namespace RaceTo21_UI.Pages
         public int CheckBustPlayers()
         {
             int bust = 0;
-            foreach(var player in players)
+            foreach (var player in players)
             {
                 if (player.status == PlayerStatus.bust)
                 {

@@ -91,12 +91,13 @@ using RaceTo21_UI.Shared;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 134 "/Users/cuiwenyue/Projects/RaceTo21_UI/RaceTo21_UI/Pages/Index.razor"
+#line 163 "/Users/cuiwenyue/Projects/RaceTo21_UI/RaceTo21_UI/Pages/Index.razor"
  
     private enum Page
     {
         Main,
-        Game
+        Game,
+        End
     }
 
     private Page page = Page.Main;
@@ -109,6 +110,8 @@ using RaceTo21_UI.Shared;
     private int cardNumber = 0;
     private string winner = null;
     private bool endCheck = false;
+    private int playerToMoveNumber = 0;
+    private bool askEnd = false;
 
     private void UpdateValue(ChangeEventArgs e)
     {
@@ -161,7 +164,7 @@ using RaceTo21_UI.Shared;
     public void ButtonClick(int cardNum)
     {
         cardNumber = cardNum;
-        Console.WriteLine("cards number: " + cardNumber);
+        //Console.WriteLine("cards number: " + cardNumber);
         PlayerTurn(currentPlayerIndex, buttonChoice, cardNumber);
         endCheck = CheckForEnd();
         if (!endCheck)
@@ -229,7 +232,51 @@ using RaceTo21_UI.Shared;
         }
         else
         {
+            currentPlayerIndex = 0;
             return true;
+        }
+    }
+
+    private string PlayerPoints(int playerIndex)
+    {
+        string points = null;
+        points = game.PlayerPoints(playerIndex).ToString();
+        return points;
+    }
+
+    private ValueTask CheckContinue(bool b)
+    {
+        game.AskContinue(currentPlayerIndex, b);
+        if (!b)
+        {
+            playerToMoveNumber++;
+        }
+        currentPlayerIndex++;
+        if (currentPlayerIndex == playerNumber)
+        {
+            RoundEnd();
+        }
+        return ValueTask.CompletedTask;
+    }
+
+    private void RoundEnd()
+    {
+        string result = game.RoundEnd();
+        if (result == "Restart")
+        {
+            playerNumber -= playerToMoveNumber;
+            currentPlayerIndex = 0;
+            buttonChoice = false;
+            choiceTime = 0;
+            cardNumber = 0;
+            winner = null;
+            endCheck = false;
+            playerToMoveNumber = 0;
+            askEnd = false;
+        }
+        else
+        {
+            page = Page.End;
         }
     }
 
